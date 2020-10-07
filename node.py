@@ -1,0 +1,62 @@
+"""
+Class Node
+Each Node represents a point on a graph, tree or list.
+---------------------------------
+self.state - state of puzzle node (3x3)
+self.parent - points to the current nodes parent node
+self.g - distance to starting node, used for heuristics
+self.h - distance to goal node, used for heuristics
+self.f - total cost node
+------------------------------------------------------------------------------------
+Three heuristics (self.h) possible:
+h1) Hamming -> Number of tiles not in goalState (excludes 0)
+h2) Manhattan -> Total amount of slides to reach goal state (Summed for each tile)
+h3) Linear Conflict + Manhattan
+    Tiles (a and b) are in linear conflict iff they are in the same row or column
+    and the goal position of tile a is blocked by the current position of tile b
+    Each linear conflict causes h to increase by 2
+    h3 = h2 + 2*(# of Linear Conflicts)
+"""
+
+
+class Node:
+    """
+    Init each node upon call, edit these fields in external program to fit data structure
+    """
+    def __init__(self, state, parent, dim):
+        self.state = state #Uses array format
+        self.parent = parent
+        self.dim = dim
+        self.g = 0 #Increases by 1 for each layer (= parent.g + 1)
+        self.h = 0
+        self.f = 0 # = g + h
+
+    """
+    Comparator functions, take in self and other node for comparison
+    """
+    def __eq__(self, other):
+        for i in range(self.dim * self.dim):
+            if self.state[i] != other.state[i]:
+                return False
+        return True
+
+    def __lt__(self, other):
+        if self.f < other.f:
+            return True
+        return False
+
+    """
+    Indexes self.state for the location of an item
+    """
+    def index(self, item):
+        for i in range(self.dim * self.dim):
+            if self.state[i] == item:
+                return i
+        return None
+
+    def print_state(self):
+        for i in range(self.dim * self.dim):
+            if i % self.dim == 0:
+                print("")
+            print(self.state[i], " ", end='')
+
