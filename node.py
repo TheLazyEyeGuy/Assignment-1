@@ -33,6 +33,7 @@ class Node:
 
     """
     Comparator functions, take in self and other node for comparison
+    Compares states for equality
     """
     def __eq__(self, other):
         for i in range(self.dim * self.dim):
@@ -40,10 +41,14 @@ class Node:
                 return False
         return True
 
+    """
+    Less than function, used for sorting lists/priority queue
+    """
     def __lt__(self, other):
         if self.f < other.f:
             return True
         return False
+
 
     """
     Indexes self.state for the location of an item

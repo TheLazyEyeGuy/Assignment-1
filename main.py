@@ -44,8 +44,8 @@ def a_star(start, goal, dim):
     #Search Loop Until Open is empty
     while not openQ.empty():
         currentNode = openQ.get() #Declare current as top of open queue
-        print(currentNode.g)
         count += 1
+        print(count)
         #Check if current node is the end state
         if currentNode.state == goal:
             #Do everything we need to do (return node count)
@@ -145,8 +145,8 @@ def manhattan_distance(s, goal, size):
     total = 0
     for i in range(size*size):
         if s[i] != 0 and s[i] != goal[i]:
-            ci = goal.index(s[i])
-            total += abs((i//size) - (ci//size)) + abs((i%size) - (ci%size)) #Calculates x and y values and heuristic
+            gi = goal.index(s[i])
+            total += abs((i//size) - (gi//size)) + abs((i%size) - (gi%size)) #Calculates x and y values and heuristic
 
     return total
 
@@ -507,7 +507,7 @@ Define a start and end state, test code
 """
 
 """dim = 4
-start = [1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 0]
+start = [1, 2, 4, 3, 6, 5, 8, 7, 9, 10, 13, 12, 11, 14, 15, 0]
 goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0]"""
 
 
