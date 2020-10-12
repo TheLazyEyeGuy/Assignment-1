@@ -21,7 +21,7 @@ def generate_puzzles(dimensions):
     if dimensions == 5:
         goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0]
 
-    while len(puzzlelist) < 3:
+    while len(puzzlelist) < 100:
         numbers = list(range(0, dimensions * dimensions))
         random.shuffle(numbers)
         if numbers not in puzzlelist and solveable(numbers, goal, dimensions):
