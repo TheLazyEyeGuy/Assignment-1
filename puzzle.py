@@ -644,7 +644,7 @@ returns nothing
 example use:
 solver(start, end)
 """
-def solver(start, goal, dim):
+"""def solver(start, goal, dim):
     if not valid_state(start, dim) or not valid_state(goal, dim):
         print("Invalid start or end state")
         return
@@ -655,7 +655,7 @@ def solver(start, goal, dim):
         #steps, count = ida_star(start, goal, dim)
         print("STEPS: ", steps, " NODES EXPANDED: ", count)
     else:
-        print("There is no solution")
+        print("There is no solution")"""
 
 """
 Main
@@ -668,13 +668,13 @@ Define a start and end state, test code
 start = [6, 3, 15, 14, 4, 7, 9, 1, 13, 11, 5, 2, 0, 10, 12, 8]
 goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0]"""
 
-dim = 3
+"""dim = 3
 start = [5, 6, 7, 4, 0, 8, 3, 2, 1]
-goal = [1, 2, 3, 8, 0, 4, 7, 6, 5]
+goal = [1, 2, 3, 8, 0, 4, 7, 6, 5]"""
 
 """dim = 5
 start = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11, 21, 14, 15, 16, 17, 0, 19, 20, 13, 22, 23, 24, 18]
 goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0]"""
 
 
-solver(start, goal, dim)
+"""solver(start, goal, dim)"""
