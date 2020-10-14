@@ -25,9 +25,9 @@ class Node:
     """
     def __init__(self, state):
         self.UID = tuple(state)
-        self.state = state #Uses array format
-        self.g = 0 #Increases by 1 for each layer (= parent.g + 1)
-        self.f = 0 # = g + h
+        self.state = state  # Uses array format
+        self.g = 0  # Increases by 1 for each layer (= parent.g + 1)
+        self.f = 0  # = g + h
 
     def __hash__(self):
         return hash(self.UID)
@@ -53,7 +53,6 @@ class Node:
     def __len__(self):
         return len(self.state)
 
-
     """
     Indexes self.state for the location of an item
     """
@@ -62,4 +61,3 @@ class Node:
             if self.state[i] == item:
                 return i
         return None
-
