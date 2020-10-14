@@ -1,5 +1,5 @@
 import random
-from main import solveable
+from puzzle import solveable
 
 """
 generate_puzzles
