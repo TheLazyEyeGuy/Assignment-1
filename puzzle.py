@@ -3,15 +3,13 @@ Main for the program, puzzles will be run through main and the program will rely
 files in order to compile and solve the puzzles correctly
 """
 
-#IMPORTS
+
+# IMPORTS
 from node import Node
 from copy import copy
 from queue import PriorityQueue
 from collections import deque
 from math import inf
-
-#CONSTANTS
-HTYPE = 3
 
 """
 a_star
@@ -26,38 +24,36 @@ nodes_visited - Returns the number of nodes visited for output (int)
 ---------------
 use example: self.a_star(tree, startState, endState);
 """
-def a_star(start, goal, dim):
-    #Lists for open and closed nodes
+def a_star(start, goal, dim, htype):
+    # Lists for open and closed nodes
     openQ = PriorityQueue()
-    #List for visited states
+    # List for visited states
     closedQ = {}
     count = 0
 
-    #Create node for start state
+    # Create node for start state
     startNode = Node(start)
     startNode.g = 0
-    calc_heuristic(startNode, goal, dim)
+    calc_heuristic(startNode, goal, dim, htype)
     startNode.f += startNode.g
 
-    #Add startNode to from of open list
+    # Add startNode to from of open list
     openQ.put(startNode)
-    closedQ[startNode.UID] = True  #Add start node to visited states
+    closedQ[startNode.UID] = True   # Add start node to visited states
 
-    #Search Loop Until Open is empty
+    # Search Loop Until Open is empty
     while not openQ.empty():
-        currentNode = openQ.get() #Declare current as top of open queue
+        currentNode = openQ.get()  # Declare current as top of open queue
         count += 1
-        print(count)
-        #Check if current node is the end state
+        # Check if current node is the end state
         if currentNode.state == goal:
-            #Do everything we need to do (return node count)
-            print("SOLUTION FOUND")
+            # Do everything we need to do (return node count)
             return currentNode.g, count
 
-        #Node not end node, expand open list with all neighbors, pass goal for h calculation
-        n1, n2, n3, n4 = move_puzzle(closedQ, currentNode, goal, dim) #Trys each movement and creates 4 nodes each whose parent is currentNode
+        # Node not end node, expand open list with all neighbors, pass goal for h calculation
+        n1, n2, n3, n4 = move_puzzle(closedQ, currentNode, goal, dim, htype) #Trys each movement and creates 4 nodes each whose parent is currentNode
 
-        #Appends nodes to list only if they are not None
+        # Appends nodes to list only if they are not None
         if n1:
             openQ.put(n1)
         if n2:
@@ -87,7 +83,7 @@ count - The number for nodes expanded searching for the solution
 --------------------------------------------------
 use example: steps, expanded = ida_star(start, goal, dim)
 """
-def ida_star(start, goal, dim):
+def ida_star(start, goal, dim, htype):
 
     """
     search
@@ -111,38 +107,38 @@ def ida_star(start, goal, dim):
     def search(openQ, g, threshold, count):
         count += 1
         currentNode = openQ[0]
-        f = g + calc_heuristic_2(currentNode, goal, dim)
-        if f > threshold:
+        f = g + calc_heuristic_2(currentNode, goal, dim, htype)  # f = g + h
+        if f > threshold:  # f heuristic > threshold
             return f, count
-        if currentNode == goal:
+        if currentNode == goal:  # Finished
             return True, count
-        ret = inf
-        #Node not end node, expand open list with all neighbors, pass goal for h calculation
-        poss = possible_moves(currentNode, dim) #Trys each movement and creates 4 nodes each whose parent is currentNode
-        #Appends nodes to list only if they are not None
+        minf = inf  # Minf is the minimum f heuristic causing a change to threshold, begin at infinity
+        # Node not end node, expand open list with all neighbors, pass goal for h calculation
+        poss = possible_moves(currentNode, dim)  # Trys each movement, creates 4 nodes each whose parent is currentNode
+        # Appends nodes to list only if they are not None
         for i in poss:
             if i not in openQ:
                 openQ.appendleft(i)
                 t, count = search(openQ, g + 1, threshold, count)
                 if t is True:
                     return True, count
-                if t < ret:
-                    ret = t
+                if t < minf:
+                    minf = t
                 openQ.popleft()
-        return ret, count
+        return minf, count
 
 
-    threshold = calc_heuristic_2(start, goal, dim) #Use this calcHeuristic, basically the same but uses array type instead of node type
-    openQ = deque([start]) #Put start state into deque
+    threshold = calc_heuristic_2(start, goal, dim, htype)  # Use this calcHeuristic, doesnt require Node, just Array
+    openQ = deque([start]) # Put start state into deque
     count = 0
-    #Search Loop Until Open is empty
+    # Search Loop Until Open is empty
     while openQ:
         t, count = search(openQ, 0, threshold, count)
         if t is True:
             return (len(openQ) - 1), count
-        elif t is inf:
+        elif t is inf:  # Should never happen, unsolveable cases should be caught by solveable, here just incase
             return (len(openQ) - 1), count
-        else:
+        else:  # If minf is updated and solution not found, change threshold
             threshold = t
 
     # This return is only used if no solution found, should never be called
@@ -167,7 +163,7 @@ def possible_moves(node, dim):
     poss = []
     x = node.index(0)
     if x % dim > 0:
-        left = copy(node) #Could make swap function for better readability
+        left = copy(node)  # Could make swap function for better readability
         temp = left[x - 1]
         left[x - 1] = left[x]
         left[x] = temp
@@ -216,23 +212,23 @@ h3) Linear Conflict + Manhattan
     Each linear conflict causes h to increase by 2
     h3 = h2 + 2*(# of Linear Conflicts)
 """
-def calc_heuristic_2(n, goal, dim):
+def calc_heuristic_2(n, goal, dim, htype):
     count = 0
 
-    if HTYPE == 1:
-        #Counts # of states not in goal position, skips 0 position
+    if htype == 1:
+        # Counts # of states not in goal position, skips 0 position
         for i in range(dim*dim):
             if n[i] != 0 and n[i] != goal[i]:
                 count += 1
         return count
 
-    elif HTYPE == 2:
-        #Calls function for each tile to sum distance from goal tile, adds to count
+    elif htype == 2:
+        # Calls function for each tile to sum distance from goal tile, adds to count
         count = manhattan_distance(n, goal, dim)
         return count
 
-    elif HTYPE == 3:
-        #Calls function to calculate linear conflicts + manhattan
+    elif htype == 3:
+        # Calls function to calculate linear conflicts + manhattan
         count = linear_conflicts(n, goal, dim)
         return count
 
@@ -263,23 +259,23 @@ h3) Linear Conflict + Manhattan
     Each linear conflict causes h to increase by 2
     h3 = h2 + 2*(# of Linear Conflicts)
 """
-def calc_heuristic(n, goal, dim):
+def calc_heuristic(n, goal, dim, htype):
     count = 0
 
-    if HTYPE == 1:
-        #Counts # of states not in goal position, skips 0 position
+    if htype == 1:
+        # Counts # of states not in goal position, skips 0 position
         for i in range(dim*dim):
             if n.state[i] != 0 and n.state[i] != goal[i]:
                 count += 1
         n.f = count
 
-    elif HTYPE == 2:
-        #Calls function for each tile to sum distance from goal tile, adds to count
+    elif htype == 2:
+        # Calls function for each tile to sum distance from goal tile, adds to count
         count = manhattan_distance(n.state, goal, dim)
         n.f = count
 
-    elif HTYPE == 3:
-        #Calls function to calculate linear conflicts + manhattan
+    elif htype == 3:
+        # Calls function to calculate linear conflicts + manhattan
         count = linear_conflicts(n.state, goal, dim)
         n.f = count
 
@@ -415,13 +411,15 @@ if valid_state(s): do something else: don't
 """
 def valid_state(s, size):
     i = 0
-    fsize = size*size #Flattened Size
-    #Loop checks if numbers are all in proper range 0-(fsize-1)
+    fsize = size*size  # Flattened Size
+    if len(s) != fsize:
+        return False  # HAPPENS IF GIVING 3x3 WITH DIM = 4
+    # Loop checks if numbers are all in proper range 0-(fsize-1)
     for i in range(fsize):
         if s[i] > (fsize - 1) or s[i] < 0:
             return False
-    valid = [0 for i in range(fsize)] #All numbers in list valid, use this to confirm
-    #Loop to check if there are repeat numbers (2 of any number is invalid)
+    valid = [0 for i in range(fsize)]  # All numbers in list valid, use this to confirm
+    # Loop to check if there are repeat numbers (2 of any number is invalid)
     for i in range(fsize):
         if valid[s[i]] == 0:
             valid[s[i]] = 1
@@ -446,29 +444,31 @@ example use:
 if solveable(startNode, goalNode): solve_puzzle else: exit
 """
 def solveable(start, goal, size):
-    #Odd size dimension (3x3, 5x5)
-    #This requires inversions to be even for solveable
+    if not (valid_state(start, size) and valid_state(goal, size)):
+        return False  # Either the start or end state is invalid
+    # Odd size dimension (3x3, 5x5)
+    # This requires inversions to be even for solveable
     if size % 2 != 0:
-        fsize = size*size #Flattened size dimension
+        fsize = size*size # Flattened size dimension
         count = 0
-        #Loop i for anchor, compares i with all other positions infront of it (j)
+        # Loop i for anchor, compares i with all other positions infront of it (j)
         for i in range(fsize):
-            #Loop j for moving comparator, always ahead of i by 1 more more spaces
+            # Loop j for moving comparator, always ahead of i by 1 more more spaces
             for j in range(i+1, fsize):
                 if start[i] and start[j] and start[i] > start[j]:
-                    count += 1 #If both states valid and i > j there is an inversion, add 1 to count
+                    count += 1  # If both states valid and i > j there is an inversion, add 1 to count
                 if goal[i] and goal[j] and goal[i] > goal[j]:
                     count += 1
 
-        #Count % 2 is 0 if even, even returns True
+        # Count % 2 is 0 if even, even returns True
         if count % 2 == 0:
             return True
 
         return False
-    #Even size dimension (4x4, 6x6)
+    # Even size dimension (4x4, 6x6)
     else:
         loc = start.index(0)
-        if loc//size % 2 == 0: #0 starts in an EVEN row (0, 2, 4) requires ODD inversions
+        if loc//size % 2 == 0:  # 0 starts in an EVEN row (0, 2, 4) requires ODD inversions
             fsize = size * size  # Flattened size dimension
             count = 0
             # Loop i for anchor, compares i with all other positions infront of it (j)
@@ -485,7 +485,7 @@ def solveable(start, goal, size):
                 return True
 
             return False
-        else: #0 starts in an ODD row (1, 3, 5), requires EVEN inversions
+        else:  # 0 starts in an ODD row (1, 3, 5), requires EVEN inversions
             fsize = size * size  # Flattened size dimension
             count = 0
             # Loop i for anchor, compares i with all other positions infront of it (j)
@@ -514,13 +514,13 @@ closedQ - List of already visited nodes
 n - node containing current state of puzzle
 goal - goal state of puzzle for heuristics
 """
-def move_puzzle(closedQ, n, goal, dim):
+def move_puzzle(closedQ, n, goal, dim, htype):
     x = n.index(0)
 
-    left = move_left(closedQ, x, n, goal, dim)
-    right = move_right(closedQ, x, n, goal, dim)
-    up = move_up(closedQ, x, n, goal, dim)
-    down = move_down(closedQ, x, n, goal, dim)
+    left = move_left(closedQ, x, n, goal, dim, htype)
+    right = move_right(closedQ, x, n, goal, dim, htype)
+    up = move_up(closedQ, x, n, goal, dim, htype)
+    down = move_down(closedQ, x, n, goal, dim, htype)
 
     return left, right, up, down
 
@@ -540,21 +540,21 @@ goal - goal state of puzzle for heuristics
 eg use:
 move_left(closedQ, x, n)
 """
-def move_left(closedQ, x, n, goal, dim):
-    #will only be 0 if in position 0, n, 2n, ..., (n*n-n) (aka cant move left)
-    if x%(dim) > 0:
+def move_left(closedQ, x, n, goal, dim, htype):
+    # will only be 0 if in position 0, n, 2n, ..., (n*n-n) (aka cant move left)
+    if x%dim > 0:
         left = copy(n.state)
         temp = left[x-1]
         left[x-1] = left[x]
         left[x] = temp
         left = Node(left)
 
-        #Check if new state has already been visited
-        #If not append left to visited nodes, if yes then return None
+        # Check if new state has already been visited
+        # If not append left to visited nodes, if yes then return None
         if not visited(closedQ, left):
             closedQ[left.UID] = True
             left.g = n.g + 1
-            calc_heuristic(left, goal, dim)
+            calc_heuristic(left, goal, dim, htype)
             left.f = left.f + left.g
             return left
         else:
@@ -563,21 +563,21 @@ def move_left(closedQ, x, n, goal, dim):
     return None
 
 
-def move_right(closedQ, x, n, goal, dim):
-    #Only enters if we can move right
-    if x%(dim) < (dim-1):
+def move_right(closedQ, x, n, goal, dim, htype):
+    # Only enters if we can move right
+    if x%dim < (dim-1):
         right = copy(n.state)
         temp = right[x+1]
         right[x+1] = right[x]
         right[x] = temp
         right = Node(right)
 
-        #Check if new state has already been visited
-        #If not append right to visited nodes, if yes then return None
+        # Check if new state has already been visited
+        # If not append right to visited nodes, if yes then return None
         if not visited(closedQ, right):
             closedQ[right.UID] = True
             right.g = n.g + 1
-            calc_heuristic(right, goal, dim)
+            calc_heuristic(right, goal, dim, htype)
             right.f = right.f + right.g
             return right
         else:
@@ -586,20 +586,20 @@ def move_right(closedQ, x, n, goal, dim):
     return None
 
 
-def move_up(closedQ, x, n, goal, dim):
-    if x-(dim) >= 0:
+def move_up(closedQ, x, n, goal, dim, htype):
+    if x-dim >= 0:
         up = copy(n.state)
         temp = up[x-dim]
         up[x-dim] = up[x]
         up[x] = temp
         up = Node(up)
 
-        #Check if new state has already been visited
-        #If not append up to visited nodes, if yes then return None
+        # Check if new state has already been visited
+        # If not append up to visited nodes, if yes then return None
         if not visited(closedQ, up):
             closedQ[up.UID] = True
             up.g = n.g + 1
-            calc_heuristic(up, goal, dim)
+            calc_heuristic(up, goal, dim, htype)
             up.f = up.f + up.g
             return up
         else:
@@ -608,20 +608,20 @@ def move_up(closedQ, x, n, goal, dim):
     return None
 
 
-def move_down(closedQ, x, n, goal, dim):
-    if x+(dim) < (dim*dim):
+def move_down(closedQ, x, n, goal, dim, htype):
+    if x+dim < (dim*dim):
         down = copy(n.state)
         temp = down[x+dim]
         down[x+dim] = down[x]
         down[x] = temp
         down = Node(down)
 
-        #Check if new state has already been visited
-        #If not append down to visited nodes, if yes then return None
+        # Check if new state has already been visited
+        # If not append down to visited nodes, if yes then return None
         if not visited(closedQ, down):
             closedQ[down.UID] = True
             down.g = n.g + 1
-            calc_heuristic(down, goal, dim)
+            calc_heuristic(down, goal, dim, htype)
             down.f = down.f + down.g
             return down
         else:
@@ -644,7 +644,7 @@ returns nothing
 example use:
 solver(start, end)
 """
-def solver(start, goal, dim):
+"""def solver(start, goal, dim):
     if not valid_state(start, dim) or not valid_state(goal, dim):
         print("Invalid start or end state")
         return
@@ -655,7 +655,7 @@ def solver(start, goal, dim):
         #steps, count = ida_star(start, goal, dim)
         print("STEPS: ", steps, " NODES EXPANDED: ", count)
     else:
-        print("There is no solution")
+        print("There is no solution")"""
 
 """
 Main
@@ -668,13 +668,13 @@ Define a start and end state, test code
 start = [6, 3, 15, 14, 4, 7, 9, 1, 13, 11, 5, 2, 0, 10, 12, 8]
 goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0]"""
 
-dim = 3
+"""dim = 3
 start = [5, 6, 7, 4, 0, 8, 3, 2, 1]
-goal = [1, 2, 3, 8, 0, 4, 7, 6, 5]
+goal = [1, 2, 3, 8, 0, 4, 7, 6, 5]"""
 
 """dim = 5
 start = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 11, 21, 14, 15, 16, 17, 0, 19, 20, 13, 22, 23, 24, 18]
 goal = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 0]"""
 
 
-solver(start, goal, dim)
+"""solver(start, goal, dim)"""
