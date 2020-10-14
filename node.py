@@ -23,20 +23,21 @@ class Node:
     """
     Init each node upon call, edit these fields in external program to fit data structure
     """
-    def __init__(self, state, parent, dim):
+    def __init__(self, state):
+        self.UID = tuple(state)
         self.state = state #Uses array format
-        self.parent = parent
-        self.dim = dim
         self.g = 0 #Increases by 1 for each layer (= parent.g + 1)
-        self.h = 0
         self.f = 0 # = g + h
+
+    def __hash__(self):
+        return hash(self.UID)
 
     """
     Comparator functions, take in self and other node for comparison
     Compares states for equality
     """
     def __eq__(self, other):
-        for i in range(self.dim * self.dim):
+        for i in range(len(self.state)):
             if self.state[i] != other.state[i]:
                 return False
         return True
@@ -49,19 +50,16 @@ class Node:
             return True
         return False
 
+    def __len__(self):
+        return len(self.state)
+
 
     """
     Indexes self.state for the location of an item
     """
     def index(self, item):
-        for i in range(self.dim * self.dim):
+        for i in range(len(self.state)):
             if self.state[i] == item:
                 return i
         return None
-
-    def print_state(self):
-        for i in range(self.dim * self.dim):
-            if i % self.dim == 0:
-                print("")
-            print(self.state[i], " ", end='')
 
