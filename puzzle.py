@@ -8,7 +8,6 @@ files in order to compile and solve the puzzles correctly
 from node import Node
 from copy import copy
 from queue import PriorityQueue
-from collections import deque
 from math import inf
 
 """
