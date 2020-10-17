@@ -21,7 +21,6 @@ puzzlenumber = 1
 print("Puzzle Number     Nodes Expanded     Steps Taken            Puzzle")
 print("---------------------------------------------------------------------------")
 for i in fourlist:
-    print(i)
     nodecount, stepscount = puzzle.ida_star(i, fourgoal, 4, 3)
     print(str(puzzlenumber).ljust(18), str(nodecount).rjust(13), str(stepscount).rjust(15), "  ", str(i).ljust(40))
     nodetotal += nodecount
