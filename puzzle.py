@@ -106,7 +106,6 @@ def ida_star(start, goal, dim, htype):
     """
     def search(currentNode, goal, threshold, count, dim, htype):
         count += 1
-        print(count)
         if currentNode.f > threshold:  # Used to update min
             return currentNode.f, count, currentNode.g
         if currentNode.state == goal:  # If goal reached return
